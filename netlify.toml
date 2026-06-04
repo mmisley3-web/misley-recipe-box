@@ -3,7 +3,8 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+  # Force dependency installation so @netlify/blobs is available to the functions.
+  command = "npm install"
 
-# Netlify Blobs needs the functions to run on the standard Node runtime.
 [functions]
   node_bundler = "esbuild"
