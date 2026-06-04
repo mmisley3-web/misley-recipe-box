@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Morgan Family Recipe Box</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Albert+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2b211a; --paper:#f6efe3; --paper-2:#efe5d4; --card:#fffdf8;
+  --olive:#6f7339; --olive-d:#565a2b; --rust:#b5481f; --rust-d:#8f3414;
+  --amber:#d98a2b; --gold:#caa14b; --line:rgba(43,33,26,.14);
+  --shadow:0 1px 2px rgba(43,33,26,.06),0 14px 38px -16px rgba(43,33,26,.32);
+  --shadow-lg:0 24px 70px -22px rgba(43,33,26,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Albert Sans',sans-serif;color:var(--ink);background:var(--paper);
+  background-image:radial-gradient(circle at 18% 12%,rgba(217,138,43,.07),transparent 42%),radial-gradient(circle at 84% 78%,rgba(111,115,57,.08),transparent 46%);
+  -webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.4;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E")}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px;position:relative;z-index:2}
+
+/* HERO */
+header.hero{position:relative;overflow:hidden;color:#fdf7ea;background:linear-gradient(135deg,#5b5f2e 0%,#6f7339 45%,#8f3414 130%)}
+.hero::after{content:"";position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 20h40M20 0v40' stroke='%23ffffff' stroke-width='.5' opacity='.25'/%3E%3C/svg%3E")}
+.hero-inner{position:relative;z-index:3;padding:60px 22px 52px;max-width:1080px;margin:0 auto}
+.crest{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;padding:7px 15px;border-radius:999px;background:rgba(255,247,234,.16);
+  border:1px solid rgba(255,247,234,.32);backdrop-filter:blur(4px);margin-bottom:20px}
+.crest svg{width:15px;height:15px}
+.kicker{font-family:'Fraunces',serif;font-style:italic;font-weight:500;font-size:clamp(17px,2.3vw,23px);opacity:.93;margin:0}
+.hero h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(38px,7vw,76px);line-height:.98;margin:.05em 0 .3em;letter-spacing:-.015em;text-shadow:0 2px 30px rgba(0,0,0,.25)}
+.hero p.sub{max-width:540px;font-size:clamp(15px,1.6vw,17.5px);line-height:1.6;opacity:.95;margin:0}
+
+/* ADD BAR */
+.addbar{position:relative;z-index:20;margin:-34px auto 0;max-width:1080px;padding:0 22px}
+.addcard{background:var(--card);border-radius:20px;box-shadow:var(--shadow-lg);padding:22px;border:1px solid rgba(43,33,26,.05)}
+.addcard h2{font-family:'Fraunces',serif;font-weight:600;font-size:20px;margin:0 0 4px}
+.addcard p.hint{font-size:13.5px;color:#7d6c58;margin:0 0 16px}
+.addrow{display:flex;gap:10px;flex-wrap:wrap}
+.addrow input{flex:1;min-width:200px;font-family:'Albert Sans';font-size:15.5px;color:var(--ink);
+  padding:15px 17px;border:1.5px solid var(--line);border-radius:13px;background:var(--paper);outline:none;transition:border-color .15s}
+.addrow input:focus{border-color:var(--olive)}
+.addrow input::placeholder{color:#a08a6f}
+.btn{font-family:'Albert Sans';font-size:15px;font-weight:600;letter-spacing:.01em;padding:15px 24px;border:none;
+  border-radius:13px;background:var(--rust);color:#fdf7ea;cursor:pointer;transition:.16s;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:var(--rust-d)}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn svg{width:17px;height:17px}
+.addnote{font-size:12.5px;color:#9a8a76;margin:13px 0 0}
+.msg{margin-top:13px;font-size:14px;font-weight:500;padding:11px 14px;border-radius:11px;display:none}
+.msg.show{display:block;animation:fade .25s ease}
+.msg.err{background:#fbe6dd;color:var(--rust-d)}
+.msg.ok{background:#eaf0d9;color:var(--olive-d)}
+@keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+
+/* manual fallback */
+.manual{margin-top:14px;padding-top:16px;border-top:1px dashed var(--line);display:none}
+.manual.show{display:block;animation:fade .25s ease}
+.manual label{font-size:12.5px;font-weight:600;color:#7d6c58;display:block;margin:0 0 6px}
+
+/* CONTROLS */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:40px 0 20px;flex-wrap:wrap}
+.bar h3{font-family:'Fraunces',serif;font-weight:600;font-size:26px;margin:0;letter-spacing:-.01em}
+.searchmini{position:relative}
+.searchmini input{font-family:'Albert Sans';font-size:14.5px;padding:11px 14px 11px 38px;border:1.5px solid var(--line);
+  border-radius:11px;background:var(--card);outline:none;width:230px;max-width:60vw}
+.searchmini input:focus{border-color:var(--olive)}
+.searchmini svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--olive)}
+
+/* GRID */
+main{padding:0 0 80px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}
+.rcard{background:var(--card);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);border:1px solid rgba(43,33,26,.05);
+  display:flex;flex-direction:column;transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s;position:relative;
+  opacity:0;transform:translateY(12px);animation:rise .45s forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.rcard:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.rcard .ph{position:relative;aspect-ratio:16/10;overflow:hidden;background:linear-gradient(135deg,var(--paper-2),#e3d6bf)}
+.rcard .ph img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.rcard:hover .ph img{transform:scale(1.05)}
+.rcard .ph .noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--olive);opacity:.5}
+.rcard .ph .noimg svg{width:48px;height:48px}
+.rcard .site{position:absolute;top:11px;left:11px;font-size:11px;font-weight:600;letter-spacing:.02em;padding:5px 10px;
+  border-radius:8px;color:#fff;background:rgba(43,33,26,.6);backdrop-filter:blur(3px);max-width:75%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rcard .body{padding:15px 16px 17px;display:flex;flex-direction:column;flex:1}
+.rcard h4{font-family:'Fraunces',serif;font-weight:600;font-size:18px;line-height:1.15;margin:0 0 6px;letter-spacing:-.01em}
+.rcard .desc{font-size:13px;line-height:1.5;color:#6f6052;margin:0 0 14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rcard .foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rcard .open{font-size:13.5px;font-weight:600;color:var(--rust);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.rcard .open svg{width:14px;height:14px}
+.rcard .open:hover{color:var(--rust-d)}
+.rcard .added{font-size:11.5px;color:#a08a6f}
+.del{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,253,248,.92);color:var(--rust);font-size:15px;display:none;align-items:center;justify-content:center;
+  box-shadow:var(--shadow);z-index:4}
+.rcard:hover .del{display:flex}
+.del:hover{background:#fff}
+
+.state{text-align:center;padding:70px 20px;color:#8a7a66}
+.state svg{width:54px;height:54px;stroke:var(--olive);opacity:.5;margin-bottom:14px}
+.state h3{font-family:'Fraunces',serif;font-size:25px;color:var(--ink);margin:0 0 8px}
+.state p{margin:0;font-size:15px;max-width:380px;margin:0 auto;line-height:1.5}
+.spinner{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--olive);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+footer{text-align:center;padding:36px 22px 60px;color:#9a8a76;font-size:13px;position:relative;z-index:2}
+footer .fl{font-family:'Fraunces',serif;font-style:italic;font-size:16px;color:var(--olive-d);margin-bottom:7px}
+
+@media(max-width:640px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
+  .rcard h4{font-size:15.5px}
+  .del{display:flex}
+  .hero-inner{padding:46px 22px 46px}
+  .bar h3{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="crest">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+      The Morgan Family
+    </span>
+    <p class="kicker">A living collection of</p>
+    <h1>The Morgan Family<br>Recipe Box</h1>
+    <p class="sub">Found something delicious online? Drop the link below and it joins the family box — shared with everyone who opens this page.</p>
+  </div>
+</header>
+
+<section class="addbar">
+  <div class="addcard">
+    <h2>Add a recipe</h2>
+    <p class="hint">Paste a link to any recipe page and we'll pull in the title and photo automatically.</p>
+    <div class="addrow">
+      <input id="urlInput" type="url" inputmode="url" placeholder="https://example.com/best-chocolate-cake" autocomplete="off">
+      <button class="btn" id="addBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Add to box
+      </button>
+    </div>
+    <div class="msg" id="msg"></div>
+    <div class="manual" id="manual">
+      <label>We couldn't read that page automatically — give it a name and we'll still save the link:</label>
+      <div class="addrow">
+        <input id="manualTitle" type="text" placeholder="Recipe name (e.g. Grandma's Apple Pie)">
+        <button class="btn" id="manualBtn">Save anyway</button>
+      </div>
+    </div>
+    <p class="addnote">Anyone who scans the QR code or opens this page sees the same shared collection.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="bar">
+    <h3 id="countTitle">The Box</h3>
+    <div class="searchmini">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="search" type="text" placeholder="Search saved recipes…" autocomplete="off">
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+  <div class="state" id="loading">
+    <div class="spinner"></div>
+    <p>Opening the recipe box…</p>
+  </div>
+  <div class="state" id="empty" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M4 7h16v13H4z"/><path d="M4 7l2-3h12l2 3"/><path d="M9 11h6"/></svg>
+    <h3>The box is empty</h3>
+    <p>Add the first recipe using the link box above — it'll show up here for everyone.</p>
+  </div>
+  <div class="state" id="noresults" style="display:none">
+    <h3>No matches</h3>
+    <p>Nothing in the box matches that search.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="fl">Gathered by the Morgans, one good link at a time.</div>
+  <div id="footCount"></div>
+</footer>
+
+<script>
+const grid=document.getElementById('grid');
+const loadingEl=document.getElementById('loading');
+const emptyEl=document.getElementById('empty');
+const noResultsEl=document.getElementById('noresults');
+const msgEl=document.getElementById('msg');
+const urlInput=document.getElementById('urlInput');
+const addBtn=document.getElementById('addBtn');
+const manualBox=document.getElementById('manual');
+const manualTitle=document.getElementById('manualTitle');
+const manualBtn=document.getElementById('manualBtn');
+const searchEl=document.getElementById('search');
+const countTitle=document.getElementById('countTitle');
+const footCount=document.getElementById('footCount');
+
+let recipes=[];
+let query="";
+let pendingUrl="";
+
+function showMsg(text,type){msgEl.textContent=text;msgEl.className='msg show '+type;}
+function hideMsg(){msgEl.className='msg';}
+
+function esc(s){return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function hostOf(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch{return '';}}
+function timeAgo(ts){
+  const d=Math.floor((Date.now()-ts)/1000);
+  if(d<60)return 'just now';
+  if(d<3600)return Math.floor(d/60)+'m ago';
+  if(d<86400)return Math.floor(d/3600)+'h ago';
+  if(d<2592000)return Math.floor(d/86400)+'d ago';
+  return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+}
+
+async function loadRecipes(){
+  try{
+    const res=await fetch('/.netlify/functions/get-recipes');
+    if(!res.ok)throw new Error('load failed');
+    recipes=await res.json();
+    recipes.sort((a,b)=>b.added-a.added);
+  }catch(e){
+    recipes=[];
+    showMsg('Could not reach the recipe box. If this is a fresh deploy, make sure the Netlify functions are live.','err');
+  }
+  loadingEl.style.display='none';
+  render();
+}
+
+function render(){
+  const list=recipes.filter(r=>{
+    if(!query)return true;
+    return (r.title+' '+(r.description||'')+' '+(r.site||'')).toLowerCase().includes(query);
+  });
+  countTitle.textContent = recipes.length ? `The Box · ${recipes.length}` : 'The Box';
+  footCount.textContent = recipes.length ? `${recipes.length} recipe${recipes.length!==1?'s':''} saved to the Morgan family box` : '';
+  grid.innerHTML='';
+  emptyEl.style.display = recipes.length===0 ? 'block':'none';
+  noResultsEl.style.display = (recipes.length>0 && list.length===0) ? 'block':'none';
+  list.forEach((r,i)=>{
+    const el=document.createElement('article');
+    el.className='rcard';
+    el.style.animationDelay=Math.min(i*30,400)+'ms';
+    const img = r.image
+      ? `<img loading="lazy" src="${esc(r.image)}" alt="${esc(r.title)}" onerror="this.style.display='none';this.parentNode.querySelector('.noimg').style.display='flex'">`
+      : '';
+    el.innerHTML=`
+      <div class="ph">
+        ${r.site?`<span class="site">${esc(r.site)}</span>`:''}
+        ${img}
+        <div class="noimg" style="display:${r.image?'none':'flex'}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v13H4z"/><path d="M4 7l2-3h12l2 3"/><path d="M9 11h6"/></svg>
+        </div>
+        <button class="del" title="Remove" data-id="${esc(r.id)}">×</button>
+      </div>
+      <div class="body">
+        <h4>${esc(r.title)}</h4>
+        ${r.description?`<p class="desc">${esc(r.description)}</p>`:'<p class="desc" style="opacity:.6">Saved link</p>'}
+        <div class="foot">
+          <a class="open" href="${esc(r.url)}" target="_blank" rel="noopener">
+            Open recipe
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+          </a>
+          <span class="added">${timeAgo(r.added)}</span>
+        </div>
+      </div>`;
+    grid.appendChild(el);
+  });
+  grid.querySelectorAll('.del').forEach(b=>b.onclick=()=>removeRecipe(b.dataset.id));
+}
+
+async function addRecipe(){
+  const url=urlInput.value.trim();
+  hideMsg();manualBox.classList.remove('show');
+  if(!url){showMsg('Paste a recipe link first.','err');return;}
+  if(!/^https?:\/\//i.test(url)){showMsg('That doesn\'t look like a web link — it should start with http.','err');return;}
+  addBtn.disabled=true;addBtn.textContent='Adding…';
+  try{
+    const res=await fetch('/.netlify/functions/add-recipe',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url})
+    });
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'failed');
+    if(data.needsTitle){
+      // metadata fetch failed — show manual fallback
+      pendingUrl=url;
+      manualBox.classList.add('show');
+      manualTitle.value='';manualTitle.focus();
+      showMsg('We couldn\'t read that page automatically.','err');
+    }else{
+      recipes.unshift(data.recipe);
+      urlInput.value='';
+      render();
+      showMsg('Added to the box! 🎉','ok');
+      setTimeout(hideMsg,2600);
+    }
+  }catch(e){
+    showMsg('Something went wrong adding that link. Try again in a moment.','err');
+  }finally{
+    addBtn.disabled=false;
+    addBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add to box';
+  }
+}
+
+async function saveManual(){
+  const title=manualTitle.value.trim();
+  if(!title){showMsg('Give the recipe a name so you can find it later.','err');return;}
+  manualBtn.disabled=true;manualBtn.textContent='Saving…';
+  try{
+    const res=await fetch('/.netlify/functions/add-recipe',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url:pendingUrl,title})
+    });
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'failed');
+    recipes.unshift(data.recipe);
+    urlInput.value='';manualTitle.value='';
+    manualBox.classList.remove('show');
+    render();
+    showMsg('Saved to the box! 🎉','ok');
+    setTimeout(hideMsg,2600);
+  }catch(e){
+    showMsg('Couldn\'t save that. Try again.','err');
+  }finally{
+    manualBtn.disabled=false;manualBtn.textContent='Save anyway';
+  }
+}
+
+async function removeRecipe(id){
+  if(!confirm('Remove this recipe from the family box?'))return;
+  const prev=recipes;
+  recipes=recipes.filter(r=>r.id!==id);
+  render();
+  try{
+    const res=await fetch('/.netlify/functions/delete-recipe',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id})
+    });
+    if(!res.ok)throw new Error();
+  }catch(e){
+    recipes=prev;render();
+    showMsg('Could not remove that recipe. Try again.','err');
+  }
+}
+
+addBtn.onclick=addRecipe;
+manualBtn.onclick=saveManual;
+urlInput.addEventListener('keydown',e=>{if(e.key==='Enter')addRecipe();});
+manualTitle.addEventListener('keydown',e=>{if(e.key==='Enter')saveManual();});
+searchEl.addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();render();});
+
+loadRecipes();
+</script>
+</body>
+</html>

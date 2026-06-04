@@ -1,0 +1,9 @@
+{
+  "name": "morgan-family-recipe-box",
+  "version": "1.0.0",
+  "description": "A dynamic, shared recipe collection for the Morgan family. Paste a link, save a recipe.",
+  "private": true,
+  "dependencies": {
+    "@netlify/blobs": "^8.2.0"
+  }
+}

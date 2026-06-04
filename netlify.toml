@@ -1,0 +1,9 @@
+# Netlify configuration for the Morgan Family Recipe Box
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# Netlify Blobs needs the functions to run on the standard Node runtime.
+[functions]
+  node_bundler = "esbuild"
