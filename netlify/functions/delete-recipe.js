@@ -1,5 +1,5 @@
 // Removes a recipe from the shared box by id.
-const { getStore } = require("./_store"),;
+const { openStore } = require("./_store");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -13,7 +13,7 @@ exports.handler = async (event) => {
   if (!id) return { statusCode: 400, body: JSON.stringify({ error: "Missing id" }) };
 
   try {
-    const store = getStore("morgan-recipes");
+    const store = openStore();
     const existing = (await store.get("all", { type: "json" })) || [];
     const list = Array.isArray(existing) ? existing : [];
     const next = list.filter((r) => r.id !== id);
