@@ -1,5 +1,5 @@
 // Returns the full shared recipe collection as a JSON array.
-const { getStore } = require("@netlify/blobs");
+const { getStore } = require("./_store");
 
 exports.handler = async () => {
   try {
