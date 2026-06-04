@@ -2,7 +2,7 @@
 // If only { url } is sent, it fetches the page and extracts title/image/description.
 // If the page can't be read, it responds { needsTitle:true } so the UI can ask for a name.
 // If { url, title } is sent, it saves directly (manual fallback).
-const { getStore } = require("@netlify/blobs");
+const { getStore } = require("./_store"),;
 
 function decodeEntities(s) {
   if (!s) return s;
