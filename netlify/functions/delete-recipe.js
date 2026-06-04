@@ -1,5 +1,5 @@
 // Removes a recipe from the shared box by id.
-const { getStore } = require("@netlify/blobs");
+const { getStore } = require("./_store"),;
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
