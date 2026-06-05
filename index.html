@@ -101,6 +101,40 @@ main{padding:0 0 80px}
   box-shadow:var(--shadow);z-index:4}
 .rcard:hover .del{display:flex}
 .del:hover{background:#fff}
+.edit-btn{position:absolute;top:10px;right:46px;width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,253,248,.92);color:var(--olive);display:none;align-items:center;justify-content:center;
+  box-shadow:var(--shadow);z-index:4}
+.rcard:hover .edit-btn{display:flex}
+.edit-btn:hover{background:#fff}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 10px}
+.tag{font-size:11.5px;font-weight:600;letter-spacing:.02em;padding:3px 9px;border-radius:999px;
+  background:rgba(111,115,57,.12);color:var(--olive-d)}
+.modal-overlay{position:fixed;inset:0;background:rgba(43,33,26,.6);backdrop-filter:blur(3px);
+  z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--card);border-radius:20px;box-shadow:var(--shadow-lg);padding:28px;
+  max-width:480px;width:100%;max-height:90vh;overflow-y:auto}
+.modal h3{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:0 0 20px}
+.modal .modal-field{margin-bottom:18px}
+.modal label{font-size:12.5px;font-weight:600;color:#7d6c58;display:block;margin:0 0 6px}
+.modal input[type=text]{width:100%;font-family:'Albert Sans';font-size:15px;color:var(--ink);
+  padding:13px 15px;border:1.5px solid var(--line);border-radius:11px;background:var(--paper);outline:none;transition:border-color .15s}
+.modal input[type=text]:focus{border-color:var(--olive)}
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border:1.5px solid var(--line);
+  border-radius:11px;background:var(--paper);cursor:text;min-height:48px;align-items:center;transition:border-color .15s}
+.tag-input-wrap:focus-within{border-color:var(--olive)}
+.tag-input-wrap .tag{cursor:default;display:inline-flex;align-items:center;gap:3px}
+.tag-input-wrap .tag .rm{background:none;border:none;cursor:pointer;color:var(--olive-d);
+  font-size:14px;padding:0 2px;line-height:1;opacity:.7}
+.tag-input-wrap .tag .rm:hover{opacity:1}
+.tag-input-wrap input{border:none;outline:none;background:transparent;font-family:'Albert Sans';
+  font-size:14px;flex:1;min-width:100px;color:var(--ink);padding:2px 0}
+.modal-hint{font-size:12px;color:#9a8a76;margin:-12px 0 16px}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:4px}
+.btn-ghost{font-family:'Albert Sans';font-size:15px;font-weight:600;padding:13px 20px;border-radius:12px;
+  border:1.5px solid var(--line);background:transparent;cursor:pointer;color:#7d6c58;transition:.15s}
+.btn-ghost:hover{background:var(--paper-2)}
+.btn-sm{padding:13px 22px;font-size:15px}
 
 .state{text-align:center;padding:70px 20px;color:#8a7a66}
 .state svg{width:54px;height:54px;stroke:var(--olive);opacity:.5;margin-bottom:14px}
@@ -116,6 +150,7 @@ footer .fl{font-family:'Fraunces',serif;font-style:italic;font-size:16px;color:v
   .grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
   .rcard h4{font-size:15.5px}
   .del{display:flex}
+  .edit-btn{display:flex}
   .hero-inner{padding:46px 22px 46px}
   .bar h3{font-size:22px}
 }
@@ -190,6 +225,27 @@ footer .fl{font-family:'Fraunces',serif;font-style:italic;font-size:16px;color:v
   <div id="footCount"></div>
 </footer>
 
+<div class="modal-overlay hidden" id="editOverlay">
+  <div class="modal">
+    <h3>Edit recipe</h3>
+    <div class="modal-field">
+      <label for="editTitle">Recipe name</label>
+      <input type="text" id="editTitle" placeholder="Recipe name" maxlength="160">
+    </div>
+    <div class="modal-field">
+      <label>Tags</label>
+      <div class="tag-input-wrap" id="tagInputWrap" onclick="document.getElementById('tagInput').focus()">
+        <input type="text" id="tagInput" placeholder="Type a tag, then press Enter or comma…">
+      </div>
+      <p class="modal-hint">Press Enter or comma to add. Backspace removes the last tag.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" id="editCancelBtn">Cancel</button>
+      <button class="btn btn-sm" id="editSaveBtn">Save changes</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const grid=document.getElementById('grid');
 const loadingEl=document.getElementById('loading');
@@ -240,7 +296,8 @@ async function loadRecipes(){
 function render(){
   const list=recipes.filter(r=>{
     if(!query)return true;
-    return (r.title+' '+(r.description||'')+' '+(r.site||'')).toLowerCase().includes(query);
+    const tagStr=r.tags?r.tags.join(' '):'';
+    return (r.title+' '+(r.description||'')+' '+(r.site||'')+' '+tagStr).toLowerCase().includes(query);
   });
   countTitle.textContent = recipes.length ? `The Box · ${recipes.length}` : 'The Box';
   footCount.textContent = recipes.length ? `${recipes.length} recipe${recipes.length!==1?'s':''} saved to the Morgan family box` : '';
@@ -261,11 +318,15 @@ function render(){
         <div class="noimg" style="display:${r.image?'none':'flex'}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v13H4z"/><path d="M4 7l2-3h12l2 3"/><path d="M9 11h6"/></svg>
         </div>
+        <button class="edit-btn" title="Edit" data-id="${esc(r.id)}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
         <button class="del" title="Remove" data-id="${esc(r.id)}">×</button>
       </div>
       <div class="body">
         <h4>${esc(r.title)}</h4>
         ${r.description?`<p class="desc">${esc(r.description)}</p>`:'<p class="desc" style="opacity:.6">Saved link</p>'}
+        ${r.tags&&r.tags.length?`<div class="tags">${r.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
         <div class="foot">
           <a class="open" href="${esc(r.url)}" target="_blank" rel="noopener">
             Open recipe
@@ -277,6 +338,7 @@ function render(){
     grid.appendChild(el);
   });
   grid.querySelectorAll('.del').forEach(b=>b.onclick=()=>removeRecipe(b.dataset.id));
+  grid.querySelectorAll('.edit-btn').forEach(b=>b.onclick=()=>openEditModal(b.dataset.id));
 }
 
 async function addRecipe(){
@@ -353,6 +415,90 @@ async function removeRecipe(id){
     showMsg('Could not remove that recipe. Try again.','err');
   }
 }
+
+// Edit modal
+let editingId=null;
+let editTags=[];
+const editOverlay=document.getElementById('editOverlay');
+const editTitleEl=document.getElementById('editTitle');
+const tagInputWrap=document.getElementById('tagInputWrap');
+const tagInput=document.getElementById('tagInput');
+const editSaveBtn=document.getElementById('editSaveBtn');
+const editCancelBtn=document.getElementById('editCancelBtn');
+
+function openEditModal(id){
+  const r=recipes.find(r=>r.id===id);
+  if(!r)return;
+  editingId=id;
+  editTags=r.tags?[...r.tags]:[];
+  editTitleEl.value=r.title;
+  renderModalTags();
+  editOverlay.classList.remove('hidden');
+  editTitleEl.focus();
+}
+
+function closeEditModal(){
+  editOverlay.classList.add('hidden');
+  editingId=null;
+  editTags=[];
+}
+
+function renderModalTags(){
+  tagInputWrap.querySelectorAll('.tag').forEach(t=>t.remove());
+  editTags.forEach(tag=>{
+    const chip=document.createElement('span');
+    chip.className='tag';
+    chip.innerHTML=`${esc(tag)}<button class="rm" title="Remove">×</button>`;
+    chip.querySelector('.rm').onclick=()=>{
+      editTags=editTags.filter(t=>t!==tag);
+      renderModalTags();
+    };
+    tagInputWrap.insertBefore(chip,tagInput);
+  });
+}
+
+function addTag(val){
+  const tag=val.trim().toLowerCase().replace(/,/g,'');
+  if(!tag||editTags.includes(tag))return;
+  editTags.push(tag);
+  renderModalTags();
+  tagInput.value='';
+}
+
+async function saveEdit(){
+  const title=editTitleEl.value.trim();
+  if(!title){editTitleEl.focus();return;}
+  editSaveBtn.disabled=true;editSaveBtn.textContent='Saving…';
+  try{
+    const res=await fetch('/.netlify/functions/edit-recipe',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:editingId,title,tags:editTags})
+    });
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'failed');
+    const idx=recipes.findIndex(r=>r.id===editingId);
+    if(idx!==-1)recipes[idx]=data.recipe;
+    closeEditModal();
+    render();
+  }catch{
+    showMsg('Could not save changes. Try again.','err');
+  }finally{
+    editSaveBtn.disabled=false;editSaveBtn.textContent='Save changes';
+  }
+}
+
+tagInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key===','){e.preventDefault();addTag(tagInput.value);}
+  if(e.key==='Backspace'&&!tagInput.value.length&&editTags.length){
+    editTags.pop();renderModalTags();
+  }
+});
+tagInput.addEventListener('blur',()=>{if(tagInput.value.trim())addTag(tagInput.value);});
+editTitleEl.addEventListener('keydown',e=>{if(e.key==='Enter')saveEdit();});
+editSaveBtn.onclick=saveEdit;
+editCancelBtn.onclick=closeEditModal;
+editOverlay.addEventListener('click',e=>{if(e.target===editOverlay)closeEditModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!editOverlay.classList.contains('hidden'))closeEditModal();});
 
 addBtn.onclick=addRecipe;
 manualBtn.onclick=saveManual;
